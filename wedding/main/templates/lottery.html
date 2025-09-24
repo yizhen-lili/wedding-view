@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>抽獎頁面</title>
+    <style>
+        #display {
+            font-size: 2em;
+            font-weight: bold;
+            margin: 50px;
+            text-align: center;
+        }
+        #lottery-button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <div id="display">準備抽獎...</div>
+
+    <form method="POST">
+        <button type="submit" id="lottery-button">抽獎!</button>
+    </form>
+
+    <script>
+        const usernames = JSON.parse('{{ unique_usernames | tojson | safe }}');
+        let index = 0;
+        let interval = null;
+
+        function startAnimation() {
+            interval = setInterval(() => {
+                display.textContent = usernames[index];
+                index = (index + 1) % usernames.length;
+            }, 100); // 每 100ms 換一個名字
+        }
+
+        function stopAnimation() {
+            clearInterval(interval);
+        }
+
+        // 按鈕按下前先啟動動畫
+        window.onload = startAnimation;
+    </script>
+</body>
+</html>

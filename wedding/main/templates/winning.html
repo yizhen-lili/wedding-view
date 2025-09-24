@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <title>抽獎結果</title>
+    <style>
+        #winner {
+            font-size: 3em;
+            font-weight: bold;
+            text-align: center;
+            margin-top: 100px;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div id="winner">恭喜抽中：{{ winning }} !</div>
+</body>
+    <a id="retry" href="{{ url_for('wedding.lottery') }}">再抽一次</a></html>
