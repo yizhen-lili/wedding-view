@@ -7,26 +7,62 @@
     <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        #displayImage {
-            max-height: 500px;
-            width: auto;
+        #photo-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .photo-slot {
+            text-align: center;
+            flex: 1 1 30%;
+            max-width: 30%;
+            min-width: 200px;
+        }
+        .photo-slot img {
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
             opacity: 0;
             transition: opacity 1s ease-in-out;
         }
-        #photo-container {
-            position: relative;
+        body {
+            background-color: #222;
+            color: white;
+            min-height: 100vh;
+        }
+        h1 {
+            text-align: center;
+            margin-bottom: 2rem;
         }
     </style>
 </head>
-<body class="bg-dark text-white">
+<body>
 
 <div class="container mt-5">
-    <h1 class="text-center mb-4">即時照片展示</h1>
-    <div id="photo-container" class="text-center">
-        <img id="displayImage" src="" class="img-fluid rounded shadow">
-        <h3 id="username" class="mt-3"></h3>
-        <p id="message"></p>
-        <small id="timestamp" class="text-muted"></small>
+    <h1>即時照片展示</h1>
+    <div id="photo-container">
+        <!-- 三個顯示槽 -->
+        <div class="photo-slot">
+            <img class="displayImage" src="">
+            <h5 class="username mt-2"></h5>
+            <p class="message mb-1"></p>
+            <small class="timestamp text-muted"></small>
+        </div>
+        <div class="photo-slot">
+            <img class="displayImage" src="">
+            <h5 class="username mt-2"></h5>
+            <p class="message mb-1"></p>
+            <small class="timestamp text-muted"></small>
+        </div>
+        <div class="photo-slot">
+            <img class="displayImage" src="">
+            <h5 class="username mt-2"></h5>
+            <p class="message mb-1"></p>
+            <small class="timestamp text-muted"></small>
+        </div>
     </div>
 </div>
 
@@ -39,42 +75,70 @@ let playlist = [];    // 主輪播清單（舊照片）
 let newQueue = [];    // 插播清單（新照片）
 let currentIndex = 0; // playlist 播放位置
 
+const photoSlots = document.querySelectorAll('.photo-slot');
+
 // 接收到後端推送的新照片
 socket.on('new_photo', (photo) => {
     console.log("📸 收到新照片：", photo);
     newQueue.push(photo);
 });
 
-// 顯示照片，淡入效果
-function displayPhoto(photo) {
-    const img = document.getElementById('displayImage');
-    img.style.opacity = 0; // 先隱藏
-    setTimeout(() => {
-        img.src = photo.image_url;
-        document.getElementById('username').textContent = photo.username;
-        document.getElementById('message').textContent = photo.message;
-        document.getElementById('timestamp').textContent = new Date(photo.uploaded_at).toLocaleString();
-        img.style.opacity = 1; // 淡入
-    }, 500); // 0.5秒後換圖
+// 顯示多張照片，淡入效果
+function displayPhotos(photos) {
+    for (let i = 0; i < 3; i++) {
+        const slot = photoSlots[i];
+        const photo = photos[i] || null; // 不足三張用 null 填充
+
+        const img = slot.querySelector('img.displayImage');
+        const username = slot.querySelector('.username');
+        const message = slot.querySelector('.message');
+        const timestamp = slot.querySelector('.timestamp');
+
+        if (photo) {
+            img.style.opacity = 0;
+            setTimeout(() => {
+                img.src = photo.image_url;
+                username.textContent = photo.username;
+                message.textContent = photo.message;
+                timestamp.textContent = new Date(photo.uploaded_at).toLocaleString();
+                img.style.opacity = 1;
+            }, 200);
+        } else {
+            img.src = '';
+            username.textContent = '';
+            message.textContent = '';
+            timestamp.textContent = '';
+            img.style.opacity = 0;
+        }
+    }
 }
 
 // 播放邏輯
 function startSlideshow() {
     setInterval(() => {
-        let nextPhoto = null;
+        let nextPhotos = [];
 
-        if (newQueue.length > 0) {
-            // 優先播放新照片
-            nextPhoto = newQueue.shift();
-            playlist.push(nextPhoto); // 播完後加入 playlist
-        } else if (playlist.length > 0) {
-            nextPhoto = playlist[currentIndex];
+        // 優先取新照片
+        while (nextPhotos.length < 3 && newQueue.length > 0) {
+            nextPhotos.push(newQueue.shift());
+        }
+
+        // 不足三張從 playlist 補齊
+        while (nextPhotos.length < 3 && playlist.length > 0) {
+            nextPhotos.push(playlist[currentIndex]);
             currentIndex = (currentIndex + 1) % playlist.length;
         }
 
-        if (nextPhoto) displayPhoto(nextPhoto);
+        // 播放
+        if (nextPhotos.length > 0) {
+            displayPhotos(nextPhotos);
 
-    }, 5000); // 每 5 秒換一張
+            // 將新照片加入 playlist
+            nextPhotos.forEach(p => {
+                if (!playlist.includes(p)) playlist.push(p);
+            });
+        }
+    }, 5000); // 每 5 秒換一組
 }
 
 // 啟動輪播

@@ -8,6 +8,7 @@ wedding = Blueprint('wedding', __name__ ,url_prefix='/wedding')
 photos = []
 @wedding.route('/', methods=['GET', 'POST'])
 def upload():
+    background=url_for('static', filename='images/image1.jpg')
     if request.method == 'POST':
         username = request.form['username']
         message = request.form['message']
@@ -39,7 +40,7 @@ def upload():
             return jsonify({"ok": True, "data": photo})
 
     else:
-            return render_template('upload.html')
+            return render_template('upload.html',background=background)
 
 
 @wedding.route('/display')
