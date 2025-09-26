@@ -1,4 +1,3 @@
-<!-- templates/upload.html -->
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
@@ -8,7 +7,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <style>
-    /* 整頁背景圖 */
+    /* === 整體背景 === */
     body {
       background-image: url('{{ background }}');
       background-size: cover;
@@ -17,6 +16,7 @@
       min-height: 100vh;
       margin: 0;
       padding: 0;
+      font-family: "Microsoft JhengHei", sans-serif;
     }
 
     /* 半透明覆蓋層 */
@@ -29,14 +29,35 @@
       padding: 20px;
     }
 
-    /* 上傳表單卡片 */
+    /* 卡片樣式 */
     .upload-card {
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.95);
       padding: 2rem;
-      border-radius: 1rem;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
-      max-width: 500px;
+      border-radius: 1.2rem;
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.3);
+      max-width: 550px;
       width: 100%;
+      transition: transform 0.2s ease-in-out;
+    }
+    .upload-card:hover {
+      transform: translateY(-3px);
+    }
+
+    /* 標題 */
+    .upload-card h2 {
+      font-weight: bold;
+      color: #2c3e50;
+    }
+
+    /* 說明文字 */
+    .descript-box {
+      background: #fef9e7;
+      border-left: 5px solid #f39c12;
+      padding: 12px 15px;
+      border-radius: 8px;
+      margin-bottom: 1.2rem;
+      font-size: 0.95rem;
+      color: #7d6608;
     }
 
     /* 預覽圖片 */
@@ -46,6 +67,10 @@
       object-fit: cover;
       margin-top: 10px;
       box-shadow: 0 0 10px rgba(0,0,0,0.2);
+      transition: transform 0.2s ease-in-out;
+    }
+    .preview-img:hover {
+      transform: scale(1.05);
     }
 
     /* 上傳中 loading */
@@ -53,13 +78,31 @@
       width: 1.2rem;
       height: 1.2rem;
     }
+
+    /* 按鈕美化 */
+    .btn-primary {
+      background: linear-gradient(to right, #f39c12, #d35400);
+      border: none;
+      font-weight: bold;
+      transition: 0.3s ease;
+    }
+    .btn-primary:hover {
+      background: linear-gradient(to right, #d35400, #f39c12);
+      transform: translateY(-2px);
+    }
   </style>
 </head>
 <body>
   <div class="overlay">
     <div class="upload-card">
-      <h2 class="text-center mb-4">婚禮照片上傳</h2>
+      <h2 class="text-center mb-3">婚禮照片上傳</h2>
 
+      <!-- 描述文字 -->
+      <div class="descript-box">
+        <i class="bi bi-info-circle-fill"></i> {{ descript }}
+      </div>
+
+      <!-- 上傳表單 -->
       <form id="uploadForm" enctype="multipart/form-data">
         <div class="mb-3">
           <label for="username" class="form-label">使用者名稱 <span class="text-danger">*</span></label>
@@ -116,7 +159,6 @@
     uploadForm.addEventListener('submit', async function(e) {
       e.preventDefault();
 
-      // 上傳中狀態
       submitText.textContent = '上傳中...';
       loadingSpinner.style.display = 'inline-block';
 

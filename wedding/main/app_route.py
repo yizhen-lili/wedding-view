@@ -8,7 +8,10 @@ wedding = Blueprint('wedding', __name__ ,url_prefix='/wedding')
 photos = []
 @wedding.route('/', methods=['GET', 'POST'])
 def upload():
-    background=url_for('static', filename='images/image1.jpg')
+    background=url_for('static', filename='images/upload.jpg')
+    descript="""
+            上傳成功後即可參加抽獎活動
+        """
     if request.method == 'POST':
         username = request.form['username']
         message = request.form['message']
@@ -40,19 +43,20 @@ def upload():
             return jsonify({"ok": True, "data": photo})
 
     else:
-            return render_template('upload.html',background=background)
+            return render_template('upload.html',background=background,descript=descript)
 
 
 @wedding.route('/display')
 def display():
-
-    return render_template('display.html')
+    background=url_for('static', filename='images/background.jpg')
+    return render_template('display.html',background=background)
 
 
 
 @wedding.route('/lottery', methods=['GET', 'POST'])
 def lottery():
     usernames = set()
+    background=url_for('static',filename='images/lottery.jpg')
     for post in db.collection('posts').select(['username']).stream():
         data = post.to_dict()
         usernames.add(data.get('username'))
@@ -61,8 +65,9 @@ def lottery():
     # 結果產出(前端收到submit 才顯示 並檔戲結果)
     winning = random.choice(unique_usernames)
     if request.method=='POST':
-        return render_template('winning.html',winning=winning)
-    return render_template('lottery.html',unique_usernames=unique_usernames)
+        background=url_for('static',filename='images/lottery.jpg')
+        return render_template('winning.html',winning=winning,background=background)
+    return render_template('lottery.html',unique_usernames=unique_usernames,background=background)
 
 @socketio.on("connect", namespace="/slideshow")
 # 像是不同路由器

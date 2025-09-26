@@ -2,18 +2,60 @@
 <html lang="zh-Hant">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>抽獎結果</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <style>
-        #winner {
-            font-size: 3em;
-            font-weight: bold;
+        body {
+            background-image: url('{{ background }}');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            min-height: 100vh;
+            margin: 0;
+            padding: 0;
+            font-family: "Microsoft JhengHei", sans-serif;
+            color: #000;
+        }
+
+        .overlay {
+            background: rgba(255, 255, 255, 0.2);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .winner-card {
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            padding: 2rem;
+            max-width: 400px;
             text-align: center;
-            margin-top: 100px;
-            color: red;
+        }
+
+        .winner-card h1 {
+            font-weight: bold;
+            color: #000;
+            margin-bottom: 1rem;
+        }
+
+        .winner-name {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #ff7f50;
+            margin-top: 1rem;
         }
     </style>
 </head>
 <body>
-    <div id="winner">恭喜抽中：{{ winning }} !</div>
+<div class="overlay">
+    <div class="winner-card">
+        <h1>🎉 中獎者 🎉</h1>
+        <div class="winner-name">{{ winning }}</div>
+    </div>
+</div>
 </body>
-    <a id="retry" href="{{ url_for('wedding.lottery') }}">再抽一次</a></html>
+</html>
